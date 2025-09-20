@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Martins - Controle de Rotas</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <!-- SheetJS para exportação de Excel/CSV -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link href="style.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Premium Sidebar with Advanced Design -->
+        <aside class="sidebar">
+            <!-- Enhanced Header with Gradient Background -->
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <div class="logo-icon">
+                        <i class="fas fa-bus"></i>
+                        <div class="icon-glow"></div>
+                    </div>
+                    <div class="logo-text">
+                        <h2 class="brand-name">MaxTour</h2>
+                        <div class="brand-tagline">Transport Solutions</div>
+                    </div>
+                </div>
+                <div class="company-info">
+                    <div class="company-badge">
+                        <i class="fas fa-building"></i>
+                        <span class="company-name">Empresa Martins</span>
+                    </div>
+                    <div class="company-status">
+                        <div class="status-indicator active"></div>
+                        <span class="status-text">Sistema Online</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Premium Navigation with Enhanced Icons -->
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Painel Principal</span>
+                    </div>
+                    <ul class="nav-list">
+                        <li class="nav-item active" data-tab="dashboard">
+                            <div class="nav-item-content">
+                                <div class="nav-icon">
+                                    <i class="fas fa-chart-pie"></i>
+                                    <div class="icon-background"></div>
+                                </div>
+                                <div class="nav-text">
+                                    <span class="nav-title">Dashboard</span>
+                                    <span class="nav-subtitle">Visão Geral</span>
+                                </div>
+                                <div class="nav-indicator"></div>
+                            </div>
+                            <div class="nav-ripple"></div>
+                        </li>
+                        <li class="nav-item" data-tab="jornadas">
+                            <div class="nav-item-content">
+                                <div class="nav-icon">
+                                    <i class="fas fa-route"></i>
+                                    <div class="icon-background"></div>
+                                </div>
+                                <div class="nav-text">
+                                    <span class="nav-title">Jornadas</span>
+                                    <span class="nav-subtitle">Controle de Trajetos</span>
+                                </div>
+                                <div class="nav-indicator"></div>
+                            </div>
+                            <div class="nav-ripple"></div>
+                        </li>
+                        <li class="nav-item" data-tab="rotas">
+                            <div class="nav-item-content">
+                                <div class="nav-icon">
+                                    <i class="fas fa-map-marked-alt"></i>
+                                    <div class="icon-background"></div>
+                                </div>
+                                <div class="nav-text">
+                                    <span class="nav-title">Rotas</span>
+                                    <span class="nav-subtitle">Configurações</span>
+                                </div>
+                                <div class="nav-indicator"></div>
+                            </div>
+                            <div class="nav-ripple"></div>
+                        </li>
+                        <li class="nav-item" data-tab="relatorios">
+                            <div class="nav-item-content">
+                                <div class="nav-icon">
+                                    <i class="fas fa-chart-bar"></i>
+                                    <div class="icon-background"></div>
+                                </div>
+                                <div class="nav-text">
+                                    <span class="nav-title">Relatórios</span>
+                                    <span class="nav-subtitle">Análises & Métricas</span>
+                                </div>
+                                <div class="nav-indicator"></div>
+                            </div>
+                            <div class="nav-ripple"></div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Quick Stats Section -->
+                <div class="nav-section">
+                    <div class="nav-section-title">
+                        <i class="fas fa-analytics"></i>
+                        <span>Status Rápido</span>
+                    </div>
+                    <div class="quick-stats">
+                        <div class="quick-stat-item">
+                            <div class="stat-icon success">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span style="color: white;" id="sidebar-online-routes">--</span>
+                                <span class="stat-label">Rotas Ativas</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            
+            <!-- Premium Footer with System Info -->
+            <div class="sidebar-footer">
+                <div class="system-info">
+                    <div class="system-status">
+                        <div class="status-dot"></div>
+                        <span class="status-text">Sistema Operacional</span>
+                    </div>
+                    <div class="version-info">
+                        <i class="fas fa-code-branch"></i>
+                        <span>v2.1.4</span>
+                    </div>
+                </div>
+                <div class="footer-actions">
+                    <button class="footer-btn" title="Configurações">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <button class="footer-btn" title="Ajuda">
+                        <i class="fas fa-question-circle"></i>
+                    </button>
+                    <button class="footer-btn" title="Notificações">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Premium Header with Advanced Features -->
+            <header class="main-header">
+                <div class="header-left">
+                    <div class="page-info">
+                        <h1 id="page-title" class="page-title">
+                            <span class="title-icon">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <div class="icon-pulse"></div>
+                            </span>
+                            Sistema MaxTour
+                            <div class="title-glow"></div>
+                        </h1>
+                        <p id="page-subtitle" class="page-subtitle">
+                            <span class="subtitle-badge">
+                                <i class="fas fa-building"></i>
+                                Empresa Martins
+                            </span>
+                            <span class="subtitle-separator">|</span>
+                            <span class="subtitle-context">Controle de Rotas</span>
+                        </p>
+                    </div>
+                    <div class="breadcrumb-nav">
+                        <div class="breadcrumb-item active">
+                            <i class="fas fa-home"></i>
+                            <span>Dashboard</span>
+                        </div>
+                        <div class="breadcrumb-separator">
+                            <i class="fas fa-chevron-right"></i>
+                        </div>
+                        <div class="breadcrumb-item">
+                            <span>Análise de Rotas</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="header-widgets">
+                        <!-- Advanced Search Box -->
+                        <div class="search-container">
+                            <div class="search-box">
+                                <div class="search-icon">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                <input type="text" placeholder="Buscar rotas, jornadas..." class="search-input">
+                                <button class="search-filter-btn" title="Filtros Avançados">
+                                    <i class="fas fa-sliders-h"></i>
+                                </button>
+                                <div class="search-backdrop"></div>
+                            </div>
+                            <div class="search-suggestions" style="display: none;">
+                                <div class="suggestion-group">
+                                    <h6>Rotas Recentes</h6>
+                                    <div class="suggestion-item">
+                                        <i class="fas fa-route"></i>
+                                        <span>Rota A - Centro</span>
+                                    </div>
+                                    <div class="suggestion-item">
+                                        <i class="fas fa-route"></i>
+                                        <span>Rota B - Industrial</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Real-time Clock -->
+                        <div class="time-widget">
+                            <div class="time-display">
+                                <div class="time-icon">
+                                    <i class="fas fa-clock"></i>
+                                    <div class="clock-animation"></div>
+                                </div>
+                                <div class="time-info">
+                                    <span id="current-time" class="time-value">20:06:14</span>
+                                    <span id="current-date" class="date-value">26 Jul 2025</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Notifications Center -->
+                        <div class="notifications-widget">
+                            <button class="notification-btn" title="Notificações">
+                                <i class="fas fa-bell"></i>
+                                <span class="notification-count">3</span>
+                                <div class="notification-pulse"></div>
+                            </button>
+                            <div class="notifications-dropdown" style="display: none;">
+                                <div class="notifications-header">
+                                    <h6>Notificações</h6>
+                                    <button class="mark-all-read">Marcar todas como lidas</button>
+                                </div>
+                                <div class="notifications-list">
+                                    <div class="notification-item unread">
+                                        <div class="notification-icon warning">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </div>
+                                        <div class="notification-content">
+                                            <p>Atraso detectado na Rota A</p>
+                                            <span class="notification-time">há 5 min</span>
+                                        </div>
+                                    </div>
+                                    <div class="notification-item unread">
+                                        <div class="notification-icon success">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                        <div class="notification-content">
+                                            <p>Jornada concluída com sucesso</p>
+                                            <span class="notification-time">há 12 min</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- User Profile Widget -->
+                        <div class="user-widget">
+                            <div class="user-profile">
+                                <div class="user-avatar">
+                                    <i class="fas fa-user"></i>
+                                    <div class="avatar-status online"></div>
+                                </div>
+                                <div class="user-info">
+                                    <span class="user-name">Admin</span>
+                                    <span class="user-role">Administrador</span>
+                                </div>
+                                <button class="user-menu-btn" title="Menu do Usuário">
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                            </div>
+                            <div class="user-dropdown" style="display: none;">
+                                <div class="user-menu">
+                                    <div class="menu-item">
+                                        <i class="fas fa-user-cog"></i>
+                                        <span>Perfil</span>
+                                    </div>
+                                    <div class="menu-item">
+                                        <i class="fas fa-cog"></i>
+                                        <span>Configurações</span>
+                                    </div>
+                                    <div class="menu-divider"></div>
+                                    <div class="menu-item logout">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                        <span>Sair</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Actions -->
+                        <div class="quick-actions">
+                            <button class="action-btn" title="Nova Jornada" onclick="abrirModalJornada()">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <button class="action-btn refresh-btn" title="Atualizar Todos os Dados" onclick="atualizarTodosOsDados()" id="btn-refresh-all">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                            <button class="action-btn" title="Tela Cheia" onclick="toggleFullscreen()">
+                                <i class="fas fa-expand"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Header Flutuante Compacto -->
+            <div id="floating-header" class="floating-header">
+                <div class="floating-header-left">
+                    <h1 class="floating-title">
+                        <span class="floating-title-icon">
+                            <i class="fas fa-tachometer-alt"></i>
+                        </span>
+                        <span id="floating-title-text">Sistema MaxTour</span>
+                    </h1>
+                </div>
+                <div class="floating-header-right">
+                    <!-- Time Widget Compacto -->
+                    <div class="floating-time">
+                        <div class="floating-time-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="floating-time-info">
+                            <span id="floating-current-time" class="floating-time-value">20:06:14</span>
+                            <span id="floating-current-date" class="floating-date-value">26 Jul 2025</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Notification Button Compacto -->
+                    <button class="floating-notification notification-btn" title="Notificações">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-count">3</span>
+                    </button>
+                    
+                    <!-- User Info Compacto -->
+                    <div class="floating-user user-profile">
+                        <div class="floating-user-avatar">
+                            <i class="fas fa-user"></i>
+                            <div class="avatar-status online"></div>
+                        </div>
+                        <div class="floating-user-info">
+                            <span class="floating-user-name">Admin</span>
+                            <span class="floating-user-role">Administrador</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Actions Compacto -->
+                    <div class="floating-actions quick-actions">
+                        <button class="floating-action-btn action-btn" title="Nova Jornada" onclick="abrirModalJornada()">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                        <button class="floating-action-btn action-btn refresh-btn" title="Atualizar Dados" onclick="atualizarTodosOsDados()" id="floating-btn-refresh">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <button class="floating-action-btn action-btn" title="Tela Cheia" onclick="toggleFullscreen()">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Tab -->
+            <section id="dashboard" class="tab-content active">
+                <!-- KPI Cards -->
+                <div class="kpi-grid">
+                    <div class="kpi-card success">
+                        <div class="kpi-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="kpi-content">
+                            <h3 id="pontualidade-geral">0%</h3>
+                            <p>Pontualidade Geral</p>
+                            <span class="kpi-trend up">Todos os dias</span>
+                        </div>
+                    </div>
+                    
+                    <div class="kpi-card success">
+                        <div class="kpi-icon">
+                            <i class="fas fa-calendar-day"></i>
+                        </div>
+                        <div class="kpi-content">
+                            <h3 id="pontualidade-hoje">0%</h3>
+                            <p>Pontualidade Hoje</p>
+                            <span class="kpi-trend up">Dia atual</span>
+                        </div>
+                    </div>
+                    
+                    <div class="kpi-card danger">
+                        <div class="kpi-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="kpi-content">
+                            <h3 id="atrasos-hoje">0</h3>
+                            <p>Total de Atrasos</p>
+                            <span class="kpi-trend down">Todos os dias</span>
+                        </div>
+                    </div>
+                    
+                    <div class="kpi-card primary">
+                        <div class="kpi-icon">
+                            <i class="fas fa-bus"></i>
+                        </div>
+                        <div class="kpi-content">
+                            <h3 id="jornadas-hoje">0</h3>
+                            <p>Total de Jornadas</p>
+                            <span class="kpi-trend">Todos os dias</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rotas Status -->
+                <div class="status-section">
+                    <h2>Status das Rotas - Movimentação Martins</h2>
+                    <div class="rotas-grid" id="rotas-status-grid">
+                        <!-- Rotas será preenchido dinamicamente -->
+                    </div>
+                </div>
+
+                <!-- Análise Avançada de Horários -->
+                <div class="analytics-section">
+                    <h2>📊 Análise Avançada de Horários</h2>
+                    
+                    <!-- Filtros -->
+                    <div class="analytics-filters">
+                        <div class="filter-group">
+                            <label for="analytics-rota">Rota:</label>
+                            <select id="analytics-rota">
+                                <!-- Rotas serão preenchidas dinamicamente -->
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="analytics-turno">Turno:</label>
+                            <select id="analytics-turno">
+                                <option value="1" selected>1º Turno (05:20-17:00)</option>
+                                <option value="2">2º Turno (23:00-07:00)</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="analytics-horario">Horário:</label>
+                            <select id="analytics-horario">
+                                <option value="13:40" selected>13:40</option>
+                                <option value="15:30">15:30</option>
+                                <option value="17:00">17:00</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="analytics-tipo-horario">Tipo de Movimentação:</label>
+                            <select id="analytics-tipo-horario">
+                                <option value="saida" selected>Saída da Martins</option>
+                                <option value="chegada">Chegada na Martins</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="analytics-data-inicio">Data Início:</label>
+                            <input type="date" id="analytics-data-inicio">
+                        </div>
+                        <div class="filter-group">
+                            <label for="analytics-data-fim">Data Fim:</label>
+                            <input type="date" id="analytics-data-fim">
+                        </div>
+                        <button class="btn-primary" onclick="atualizarGraficosAnalytics()">
+                            🔄 Atualizar Gráficos
+                        </button>
+                    </div>
+
+                    <!-- Gráficos -->
+                    <div class="charts-container">
+                        <div class="chart-card candlestick-chart">
+                            <h3>🗓️ Análise Temporal de Horários (Área)</h3>
+                            <div class="chart-info">
+                                <p><strong>Azul:</strong> Horários Programados | <strong>Vermelho:</strong> Horários Reais</p>
+                                <p><strong>Área:</strong> Comparação visual entre programado e real ao longo do tempo</p>
+                            </div>
+                            <div id="candlestick-chart"></div>
+                        </div>
+                        
+                        <div class="chart-card pizza-chart">
+                            <h3>🍕 Distribuição por Rotas</h3>
+                            <div class="chart-metrics">
+                                <div class="metric">
+                                    <span class="metric-label">Total Jornadas:</span>
+                                    <span class="metric-value" id="total-jornadas-pizza">0</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="metric-label">Atrasos:</span>
+                                    <span class="metric-value" id="total-atrasos-pizza">0</span>
+                                </div>
+                            </div>
+                            <div id="pizza-chart"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance por Turno - Enhanced -->
+                <div class="performance-section">
+                    <div class="section-header-enhanced">
+                        <div class="section-title-group">
+                            <h2>
+                                <i class="fas fa-clock"></i>
+                                Performance por Turno
+                            </h2>
+                            <p class="section-subtitle">Análise detalhada de desempenho por períodos operacionais</p>
+                        </div>
+                        <div class="section-actions-enhanced">
+                            <div class="performance-summary">
+                                <div class="summary-item">
+                                    <i class="fas fa-chart-line"></i>
+                                    <span class="summary-label">Eficiência Global:</span>
+                                    <span class="summary-value" id="eficiencia-global">--</span>
+                                </div>
+                                <div class="summary-item">
+                                    <i class="fas fa-calendar-day"></i>
+                                    <span class="summary-label">Última Atualização:</span>
+                                    <span class="summary-value" id="ultima-atualizacao">--</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="turnos-grid-enhanced">
+                        <!-- 1º Turno Card Premium -->
+                        <div class="turno-card-premium turno-matutino">
+                            <div class="turno-header">
+                                <div class="turno-icon-container">
+                                    <div class="turno-icon morning">
+                                        <i class="fas fa-sun"></i>
+                                        <div class="icon-glow morning-glow"></div>
+                                    </div>
+                                </div>
+                                <div class="turno-title-group">
+                                    <h3>1º TURNO</h3>
+                                    <span class="turno-periodo">05:20 - 18:10</span>
+                                    <div class="turno-status active">
+                                        <div class="status-dot"></div>
+                                        <span>Operacional</span>
+                                    </div>
+                                </div>
+                                <div class="turno-performance-badge">
+                                    <div class="performance-indicator" id="indicator-turno1">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                    </div>
+                                    <span class="performance-level" id="level-turno1">Carregando...</span>
+                                </div>
+                            </div>
+                            
+                            <div class="turno-stats-enhanced">
+                                <div class="stats-row primary">
+                                    <div class="stat-item">
+                                        <div class="stat-icon success">
+                                            <i class="fas fa-bullseye"></i>
+                                        </div>
+                                        <div class="stat-content">
+                                            <span class="stat-label">Pontualidade</span>
+                                            <span class="stat-value" id="pontualidade-turno1">--</span>
+                                            <span class="stat-trend" id="trend-pontualidade-turno1">--</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="stat-item">
+                                        <div class="stat-icon primary">
+                                            <i class="fas fa-route"></i>
+                                        </div>
+                                        <div class="stat-content">
+                                            <span class="stat-label">Jornadas</span>
+                                            <span class="stat-value" id="jornadas-turno1">--</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="stats-row secondary">
+                                    <div class="stat-item">
+                                        <div class="stat-icon warning">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                        <div class="stat-content">
+                                            <span class="stat-label">Atraso Médio</span>
+                                            <span class="stat-value" id="atraso-turno1">--</span>
+                                            <span class="stat-trend" id="trend-atraso-turno1">--</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="stat-item">
+                                        <div class="stat-icon info">
+                                            <i class="fas fa-star"></i>
+                                        </div>
+                                        <div class="stat-content">
+                                            <span class="stat-label">Horário Top</span>
+                                            <span class="stat-value" id="horario-top-turno1">--</span>
+                                            <span class="stat-trend" id="trend-horario-turno1">--</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="stats-row tertiary">
+                                    <div class="stat-item">
+                                        <div class="stat-icon danger">
+                                            <i class="fas fa-calendar-times"></i>
+                                        </div>
+                                        <div class="stat-content">
+                                            <span class="stat-label">Dias com Atraso</span>
+                                            <span class="stat-value" id="dias-atraso-turno1">--</span>
+                                            <span class="stat-trend" id="trend-dias-turno1">--</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="stat-item">
+                                        <div class="stat-icon warning">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </div>
+                                        <div class="stat-content">
+                                            <span class="stat-label">Rota Crítica</span>
+                                            <span class="stat-value" id="rota-critica-turno1">--</span>
+                                            <span class="stat-trend" id="trend-rota-turno1">--</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="performance-chart-mini">
+                                    <div class="chart-header">
+                                        <span class="chart-title">Tendência Semanal</span>
+                                        <span class="chart-value" id="chart-value-turno1">--</span>
+                                    </div>
+                                    <div class="mini-chart" id="chart-turno1">
+                                        <!-- Gráfico será preenchido dinamicamente -->
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="turno-actions">
+                                <button class="action-btn primary" title="Ver Detalhes">
+                                    <i class="fas fa-chart-line"></i>
+                                    <span>Análise</span>
+                                </button>
+                                <button class="action-btn secondary" title="Relatório">
+                                    <i class="fas fa-file-alt"></i>
+                                    <span>Relatório</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 2º Turno Card Premium -->
+                        <div class="turno-card-premium turno-noturno">
+                            <div class="turno-header">
+                                <div class="turno-icon-container">
+                                    <div class="turno-icon night">
+                                        <i class="fas fa-moon"></i>
+                                        <div class="icon-glow night-glow"></div>
+                                    </div>
+                                </div>
+                                <div class="turno-title-group">
+                                    <h3>2º TURNO</h3>
+                                    <span class="turno-periodo">23:00 - 08:10</span>
+                                    <div class="turno-status active">
+                                        <div class="status-dot"></div>
+                                        <span>Operacional</span>
+                                    </div>
+                                </div>
+                                <div class="turno-performance-badge">
+                                    <div class="performance-indicator" id="indicator-turno2">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                    </div>
+                                    <span class="performance-level" id="level-turno2">Carregando...</span>
+                                </div>
+                            </div>
+                            
+                            <div class="turno-stats-enhanced">
+                                <div class="stats-row primary">
+                                    <div class="stat-item">
+                                        <div class="stat-icon success">
+                                            <i class="fas fa-bullseye"></i>
+                                        </div>
+                                        <div class="stat-content">
+                                            <span class="stat-label">Pontualidade</span>
+                                            <span class="stat-value" id="pontualidade-turno2">--</span>
+                                            <span class="stat-trend" id="trend-pontualidade-turno2">--</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="stat-item">
+                                        <div class="stat-icon primary">
+                                            <i class="fas fa-route"></i>
+                                        </div>
+                                        <div class="stat-content">
+                                            <span class="stat-label">Jornadas</span>
+                                            <span class="stat-value" id="jornadas-turno2">--</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="stats-row secondary">
+                                    <div class="stat-item">
+                                        <div class="stat-icon warning">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                        <div class="stat-content">
+                                            <span class="stat-label">Atraso Médio</span>
+                                            <span class="stat-value" id="atraso-turno2">--</span>
+                                            <span class="stat-trend" id="trend-atraso-turno2">--</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="stat-item">
+                                        <div class="stat-icon info">
+                                            <i class="fas fa-star"></i>
+                                        </div>
+                                        <div class="stat-content">
+                                            <span class="stat-label">Horário Top</span>
+                                            <span class="stat-value" id="horario-top-turno2">--</span>
+                                            <span class="stat-trend" id="trend-horario-turno2">--</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="stats-row tertiary">
+                                    <div class="stat-item">
+                                        <div class="stat-icon danger">
+                                            <i class="fas fa-calendar-times"></i>
+                                        </div>
+                                        <div class="stat-content">
+                                            <span class="stat-label">Dias com Atraso</span>
+                                            <span class="stat-value" id="dias-atraso-turno2">--</span>
+                                            <span class="stat-trend" id="trend-dias-turno2">--</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="stat-item">
+                                        <div class="stat-icon warning">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </div>
+                                        <div class="stat-content">
+                                            <span class="stat-label">Rota Crítica</span>
+                                            <span class="stat-value" id="rota-critica-turno2">--</span>
+                                            <span class="stat-trend" id="trend-rota-turno2">--</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="performance-chart-mini">
+                                    <div class="chart-header">
+                                        <span class="chart-title">Tendência Semanal</span>
+                                        <span class="chart-value" id="chart-value-turno2">--</span>
+                                    </div>
+                                    <div class="mini-chart" id="chart-turno2">
+                                        <!-- Gráfico será preenchido dinamicamente -->
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="turno-actions">
+                                <button class="action-btn primary" title="Ver Detalhes">
+                                    <i class="fas fa-chart-line"></i>
+                                    <span>Análise</span>
+                                </button>
+                                <button class="action-btn secondary" title="Relatório">
+                                    <i class="fas fa-file-alt"></i>
+                                    <span>Relatório</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Comparação de Turnos -->
+                    <div class="turnos-comparison">
+                        <div class="comparison-header">
+                            <h3>
+                                <i class="fas fa-balance-scale"></i>
+                                Comparação de Performance
+                            </h3>
+                            <div class="comparison-filters">
+                                <select class="comparison-select">
+                                    <option value="7">Últimos 7 dias</option>
+                                    <option value="30" selected>Últimos 30 dias</option>
+                                    <option value="90">Últimos 90 dias</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="comparison-grid">
+                            <div class="comparison-metric">
+                                <div class="metric-header">
+                                    <i class="fas fa-trophy"></i>
+                                    <span>Melhor Pontualidade</span>
+                                </div>
+                                <div class="metric-winner" id="comparison-pontualidade">
+                                    <div class="winner-badge">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                        <span>Carregando...</span>
+                                    </div>
+                                    <div class="winner-value">-- vs --</div>
+                                    <div class="winner-diff">--</div>
+                                </div>
+                            </div>
+                            
+                            <div class="comparison-metric">
+                                <div class="metric-header">
+                                    <i class="fas fa-clock"></i>
+                                    <span>Menor Atraso Médio</span>
+                                </div>
+                                <div class="metric-winner" id="comparison-atraso">
+                                    <div class="winner-badge">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                        <span>Carregando...</span>
+                                    </div>
+                                    <div class="winner-value">-- vs --</div>
+                                    <div class="winner-diff">--</div>
+                                </div>
+                            </div>
+                            
+                            <div class="comparison-metric">
+                                <div class="metric-header">
+                                    <i class="fas fa-route"></i>
+                                    <span>Mais Jornadas</span>
+                                </div>
+                                <div class="metric-winner" id="comparison-jornadas">
+                                    <div class="winner-badge">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                        <span>Carregando...</span>
+                                    </div>
+                                    <div class="winner-value">-- vs --</div>
+                                    <div class="winner-diff">--</div>
+                                </div>
+                            </div>
+                            
+                            <div class="comparison-metric">
+                                <div class="metric-header">
+                                    <i class="fas fa-calendar-check"></i>
+                                    <span>Menos Dias com Atraso</span>
+                                </div>
+                                <div class="metric-winner" id="comparison-dias-atraso">
+                                    <div class="winner-badge">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                        <span>Carregando...</span>
+                                    </div>
+                                    <div class="winner-value">-- vs --</div>
+                                    <div class="winner-diff">--</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="comparison-insights" id="comparison-insights">
+                            <div class="insight-item info">
+                                <i class="fas fa-info-circle"></i>
+                                <span>Carregando análise comparativa dos turnos...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Jornadas Tab -->
+            <section id="jornadas" class="tab-content">
+                <div class="section-header">
+                    <h2>Controle de Jornadas</h2>
+                    <div class="section-actions">
+                        <select id="filtro-rota" class="filter-select">
+                            <option value="">Todas as Rotas</option>
+                        </select>
+                        <select id="filtro-turno" class="filter-select">
+                            <option value="">Todos os Turnos</option>
+                            <option value="primeiro_turno">1º Turno</option>
+                            <option value="segundo_turno">2º Turno</option>
+                        </select>
+                        <input type="date" id="filtro-data" class="filter-date">
+                        <button class="btn-primary" onclick="abrirModalJornada()">
+                            <i class="fas fa-plus"></i> Nova Jornada
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table id="jornadas-table">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Rota</th>
+                                <th>Turno</th>
+                                <th>Horário Martins</th>
+                                <th>Retorno/Destino</th>
+                                <th>Status</th>
+                                <th>Atraso</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="jornadas-tbody">
+                            <!-- Jornadas serão preenchidas dinamicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Rotas Tab -->
+            <section id="rotas" class="tab-content">
+                <div class="section-header">
+                    <h2>Configuração de Rotas</h2>
+                    <button class="btn-primary" onclick="abrirModalRota()">
+                        <i class="fas fa-plus"></i> Nova Rota
+                    </button>
+                </div>
+                
+                <div class="rotas-config-grid" id="rotas-config-grid">
+                    <!-- Rotas de configuração serão preenchidas dinamicamente -->
+                </div>
+            </section>
+
+            <!-- Relatórios Tab -->
+            <section id="relatorios" class="tab-content">
+                <div class="section-header">
+                    <h2>Relatórios de Performance</h2>
+                    <div class="section-actions">
+                        <input type="date" id="data-inicio" class="filter-date">
+                        <input type="date" id="data-fim" class="filter-date">
+                        <select id="filtro-rota-relatorio" class="filter-select">
+                            <option value="">Todas as rotas</option>
+                        </select>
+                        <button class="btn-primary" onclick="gerarRelatorio()" id="btn-gerar-relatorio">
+                            <i class="fas fa-chart-bar"></i> 
+                            <span class="btn-text">Gerar Relatório</span>
+                            <span class="btn-loading" style="display: none;">
+                                <i class="fas fa-spinner fa-spin"></i> Carregando...
+                            </span>
+                        </button>
+                        <button class="btn-secondary" onclick="exportarRelatorio('excel')" id="btn-export-excel" disabled>
+                            <i class="fas fa-file-excel"></i> Excel
+                        </button>
+                        <button class="btn-secondary" onclick="exportarRelatorio('csv')" id="btn-export-csv" disabled>
+                            <i class="fas fa-file-csv"></i> CSV
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="relatorio-container" id="relatorio-container" style="display:none;">
+                    <!-- Resumo Geral Premium -->
+                    <div class="resumo-geral-premium">
+                        <div class="resumo-header">
+                            <div class="resumo-title-group">
+                                <h3>
+                                    <i class="fas fa-chart-line"></i>
+                                    Resumo Executivo
+                                </h3>
+                                <p class="resumo-subtitle">Indicadores gerais de performance do período selecionado</p>
+                            </div>
+                            <div class="resumo-actions">
+                                <button class="resumo-btn export" title="Exportar Resumo">
+                                    <i class="fas fa-download"></i>
+                                </button>
+                                <button class="resumo-btn refresh" title="Atualizar Dados">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="resumo-stats-grid">
+                            <div class="resumo-card primary">
+                                <div class="resumo-card-icon">
+                                    <i class="fas fa-route"></i>
+                                </div>
+                                <div class="resumo-card-content">
+                                    <div class="resumo-card-value" id="relatorio-total-percursos">0</div>
+                                    <div class="resumo-card-label">Total de Percursos</div>
+                                    <div class="resumo-card-trend">
+                                        <i class="fas fa-arrow-up"></i>
+                                        <span>vs período anterior</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="resumo-card success">
+                                <div class="resumo-card-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="resumo-card-content">
+                                    <div class="resumo-card-value" id="relatorio-media-atraso-chegada">0 min</div>
+                                    <div class="resumo-card-label">Média Atraso Retorno/Destino</div>
+                                    <div class="resumo-card-trend">
+                                        <i class="fas fa-arrow-down"></i>
+                                        <span>Indicador principal</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="resumo-card warning">
+                                <div class="resumo-card-icon">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div class="resumo-card-content">
+                                    <div class="resumo-card-value" id="relatorio-maior-atraso-chegada">0 min</div>
+                                    <div class="resumo-card-label">Maior Atraso Retorno/Destino</div>
+                                    <div class="resumo-card-trend">
+                                        <i class="fas fa-arrow-up"></i>
+                                        <span>Pico do período</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="resumo-card info">
+                                <div class="resumo-card-icon">
+                                    <i class="fas fa-bullseye"></i>
+                                </div>
+                                <div class="resumo-card-content">
+                                    <div class="resumo-card-value" id="relatorio-pontualidade-chegada">0%</div>
+                                    <div class="resumo-card-label">Pontualidade Retorno/Destino</div>
+                                    <div class="resumo-card-trend">
+                                        <i class="fas fa-arrow-up"></i>
+                                        <span>Meta: 95%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Métricas Secundárias Colapsáveis -->
+                        <div class="resumo-expandable">
+                            <button class="resumo-expand-btn" onclick="toggleMetricasSecundarias()">
+                                <i class="fas fa-chevron-down"></i>
+                                <span>Métricas Detalhadas - Movimentação Martins</span>
+                            </button>
+                            <div class="resumo-secondary-metrics" id="metricas-secundarias" style="display: none;">
+                                <div class="secondary-metrics-grid">
+                                    <div class="metric-item">
+                                        <span class="metric-label">
+                                            <i class="fas fa-play"></i>
+                                            Média Atraso Saída Martins:
+                                        </span>
+                                        <span class="metric-value" id="relatorio-media-atraso-saida">0 min</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <span class="metric-label">
+                                            <i class="fas fa-clock"></i>
+                                            Maior Atraso Saída Martins:
+                                        </span>
+                                        <span class="metric-value" id="relatorio-maior-atraso-saida">0 min</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <span class="metric-label">
+                                            <i class="fas fa-check-circle"></i>
+                                            Pontualidade Saída Martins:
+                                        </span>
+                                        <span class="metric-value" id="relatorio-pontualidade-saida">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Relatório por Rota Premium -->
+                    <div class="relatorio-por-rota-premium">
+                        <div class="relatorio-section-header">
+                            <div class="section-title-group">
+                                <h3>
+                                    <i class="fas fa-map-marked-alt"></i>
+                                    Performance por Rota
+                                </h3>
+                                <p class="section-subtitle">Análise detalhada da performance de cada rota no período</p>
+                            </div>
+                            <div class="section-filters">
+                                <div class="filter-toggle-group">
+                                    <button class="filter-toggle active" data-sort="pontualidade">
+                                        <i class="fas fa-sort-amount-down"></i>
+                                        Por Pontualidade
+                                    </button>
+                                    <button class="filter-toggle" data-sort="atrasos">
+                                        <i class="fas fa-sort-amount-up"></i>
+                                        Por Atrasos
+                                    </button>
+                                    <button class="filter-toggle" data-sort="volume">
+                                        <i class="fas fa-sort-numeric-down"></i>
+                                        Por Volume
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="table-container-premium">
+                            <div class="table-wrapper">
+                                <table id="relatorio-rotas-table" class="premium-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="sortable" data-column="rota">
+                                                <div class="th-content">
+                                                    <i class="fas fa-route"></i>
+                                                    <span>Rota</span>
+                                                    <i class="fas fa-sort sort-icon"></i>
+                                                </div>
+                                            </th>
+                                            <th class="sortable" data-column="percursos">
+                                                <div class="th-content">
+                                                    <i class="fas fa-list-ol"></i>
+                                                    <span>Percursos</span>
+                                                    <i class="fas fa-sort sort-icon"></i>
+                                                </div>
+                                            </th>
+                                            <th class="sortable" data-column="media-chegada">
+                                                <div class="th-content">
+                                                    <i class="fas fa-clock"></i>
+                                                    <span>Atraso Médio</span>
+                                                    <i class="fas fa-sort sort-icon"></i>
+                                                </div>
+                                            </th>
+                                            <th class="sortable" data-column="maior-atraso">
+                                                <div class="th-content">
+                                                    <i class="fas fa-exclamation-triangle"></i>
+                                                    <span>Maior Atraso</span>
+                                                    <i class="fas fa-sort sort-icon"></i>
+                                                </div>
+                                            </th>
+                                            <th class="sortable" data-column="pontualidade">
+                                                <div class="th-content">
+                                                    <i class="fas fa-bullseye"></i>
+                                                    <span>Pontualidade</span>
+                                                    <i class="fas fa-sort sort-icon"></i>
+                                                </div>
+                                            </th>
+                                            <th>
+                                                <div class="th-content">
+                                                    <i class="fas fa-chart-bar"></i>
+                                                    <span>Ações</span>
+                                                </div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="relatorio-rotas-tbody">
+                                        <!-- Relatório por rota será preenchido dinamicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Detalhes dos Percursos Premium -->
+                    <div class="relatorio-detalhado-premium">
+                        <div class="relatorio-section-header">
+                            <div class="section-title-group">
+                                <h3>
+                                    <i class="fas fa-list-alt"></i>
+                                    Detalhamento de Percursos
+                                </h3>
+                                <p class="section-subtitle">Registro completo de todas as jornadas do período selecionado</p>
+                            </div>
+                            <div class="section-actions">
+                                <div class="search-box-mini">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" placeholder="Filtrar percursos..." id="filtro-percursos">
+                                </div>
+                                <div class="pagination-info">
+                                    <span id="pagination-info">Carregando...</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="table-container-premium">
+                            <div class="table-wrapper">
+                                <table id="relatorio-detalhes-table" class="premium-table detailed">
+                                    <thead>
+                                        <tr>
+                                            <th class="sortable" data-column="data">
+                                                <div class="th-content">
+                                                    <i class="fas fa-calendar"></i>
+                                                    <span>Data</span>
+                                                    <i class="fas fa-sort sort-icon"></i>
+                                                </div>
+                                            </th>
+                                            <th class="sortable" data-column="rota">
+                                                <div class="th-content">
+                                                    <i class="fas fa-route"></i>
+                                                    <span>Rota</span>
+                                                    <i class="fas fa-sort sort-icon"></i>
+                                                </div>
+                                            </th>
+                                            <th class="sortable" data-column="turno">
+                                                <div class="th-content">
+                                                    <i class="fas fa-clock"></i>
+                                                    <span>Turno</span>
+                                                    <i class="fas fa-sort sort-icon"></i>
+                                                </div>
+                                            </th>
+                                            <th>
+                                                <div class="th-content">
+                                                    <i class="fas fa-building"></i>
+                                                    <span>Horário Martins</span>
+                                                </div>
+                                            </th>
+                                            <th>
+                                                <div class="th-content">
+                                                    <i class="fas fa-map-marker-alt"></i>
+                                                    <span>Retorno/Destino</span>
+                                                </div>
+                                            </th>
+                                            <th class="sortable" data-column="atraso-chegada">
+                                                <div class="th-content">
+                                                    <i class="fas fa-stopwatch"></i>
+                                                    <span>Atraso</span>
+                                                    <i class="fas fa-sort sort-icon"></i>
+                                                </div>
+                                            </th>
+                                            <th>
+                                                <div class="th-content">
+                                                    <i class="fas fa-comment"></i>
+                                                    <span>Observações</span>
+                                                </div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="relatorio-detalhes-tbody">
+                                        <!-- Detalhes dos percursos serão preenchidos dinamicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- Pagination Premium -->
+                            <div class="pagination-premium">
+                                <div class="pagination-info-left">
+                                    <span>Mostrando <strong id="items-showing">0</strong> de <strong id="items-total">0</strong> percursos</span>
+                                </div>
+                                <div class="pagination-controls">
+                                    <button class="pagination-btn" id="btn-first" title="Primeira página">
+                                        <i class="fas fa-angle-double-left"></i>
+                                    </button>
+                                    <button class="pagination-btn" id="btn-prev" title="Página anterior">
+                                        <i class="fas fa-angle-left"></i>
+                                    </button>
+                                    <div class="pagination-numbers" id="pagination-numbers">
+                                        <!-- Números das páginas serão gerados dinamicamente -->
+                                    </div>
+                                    <button class="pagination-btn" id="btn-next" title="Próxima página">
+                                        <i class="fas fa-angle-right"></i>
+                                    </button>
+                                    <button class="pagination-btn" id="btn-last" title="Última página">
+                                        <i class="fas fa-angle-double-right"></i>
+                                    </button>
+                                </div>
+                                <div class="pagination-size">
+                                    <label>
+                                        <span>Itens por página:</span>
+                                        <select id="page-size">
+                                            <option value="10">10</option>
+                                            <option value="25" selected>25</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                        </select>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal Nova Jornada -->
+    <div id="modal-jornada" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-jornada-title">Nova Jornada</h3>
+                <button class="close-modal" onclick="fecharModal('modal-jornada')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="form-jornada">
+                <input type="hidden" id="jornada-id" value="">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="jornada-rota">Rota:</label>
+                        <select id="jornada-rota" required onchange="atualizarHorariosDisponiveis()">
+                            <option value="">Selecione uma rota</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="jornada-data">Data:</label>
+                        <input type="date" id="jornada-data" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="jornada-turno">Turno:</label>
+                        <select id="jornada-turno" required onchange="atualizarHorariosDisponiveis()">
+                            <option value="">Selecione o turno</option>
+                            <option value="primeiro_turno">1º Turno</option>
+                            <option value="segundo_turno">2º Turno</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="jornada-horario-programado">Horário Programado:</label>
+                        <select id="jornada-horario-programado" required onchange="preencherHorariosProgramados()">
+                            <option value="">Selecione primeiro rota e turno</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Opção de Não Houve Rota -->
+                    <div class="form-group full-width">
+                        <div class="checkbox-container">
+                            <input type="checkbox" id="nao-houve-rota" onchange="toggleNaoHouveRota()">
+                            <label for="nao-houve-rota" class="checkbox-label">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Não houve rota neste horário
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Campos de Horários (ocultados quando "não houve rota" está marcado) -->
+                    <div id="campos-horarios">
+                        <div class="form-group">
+                            <label for="jornada-saida-programada">Horário Programado (Martins):</label>
+                            <input type="time" id="jornada-saida-programada" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="jornada-chegada-programada">Tolerância Máxima:</label>
+                            <input type="time" id="jornada-chegada-programada" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="jornada-chegada-real">Horário Retorno/Destino:</label>
+                            <input type="time" id="jornada-chegada-real">
+                        </div>
+                    </div>
+                    
+                    <!-- Campo de Motivo (visível apenas quando "não houve rota" está marcado) -->
+                    <div id="campo-motivo" class="form-group full-width" style="display: none;">
+                        <label for="jornada-motivo">Motivo da ausência da rota:</label>
+                        <select id="jornada-motivo" onchange="atualizarObservacaesComMotivo()">
+                            <option value="">Selecione o motivo</option>
+                            <option value="manutencao">Manutenção do veículo</option>
+                            <option value="falta_motorista">Falta de motorista</option>
+                            <option value="problema_tecnico">Problema técnico</option>
+                            <option value="condicoes_climaticas">Condições climáticas adversas</option>
+                            <option value="feriado">Feriado/Ponto facultativo</option>
+                            <option value="cancelamento_empresa">Cancelamento pela empresa</option>
+                            <option value="outro">Outro motivo</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label for="jornada-observacoes">Observações:</label>
+                        <textarea id="jornada-observacoes" rows="3" placeholder="Detalhes adicionais sobre a jornada ou motivo da ausência..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="fecharModal('modal-jornada')">Cancelar</button>
+                    <button type="submit" class="btn-primary" id="btn-salvar-jornada">Salvar Jornada</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Nova Rota -->
+    <div id="modal-rota" class="modal">
+        <div class="modal-content large-modal">
+            <div class="modal-header">
+                <h3>Configuração de Rota</h3>
+                <button class="close-modal" onclick="fecharModal('modal-rota')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="form-rota">
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="rota-id">ID da Rota:</label>
+                        <input type="text" id="rota-id" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="rota-nome">Nome da Rota:</label>
+                        <input type="text" id="rota-nome" required>
+                    </div>
+                </div>
+
+                <!-- Primeiro Turno -->
+                <div class="turno-section">
+                    <div class="turno-header">
+                        <h4><i class="fas fa-sun"></i> 1º Turno</h4>
+                        <div class="turno-controls">
+                            <button type="button" class="btn-control add" onclick="adicionarHorario('primeiro_turno')" title="Adicionar Horário">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="horarios-primeiro-turno" class="horarios-container">
+                        <!-- Horários do primeiro turno serão gerados dinamicamente -->
+                    </div>
+                </div>
+
+                <!-- Segundo Turno -->
+                <div class="turno-section">
+                    <div class="turno-header">
+                        <h4><i class="fas fa-moon"></i> 2º Turno</h4>
+                        <div class="turno-controls">
+                            <button type="button" class="btn-control add" onclick="adicionarHorario('segundo_turno')" title="Adicionar Horário">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="horarios-segundo-turno" class="horarios-container">
+                        <!-- Horários do segundo turno serão gerados dinamicamente -->
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="fecharModal('modal-rota')">Cancelar</button>
+                    <button type="submit" class="btn-primary">Salvar Rota</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>
