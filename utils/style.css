@@ -10,6 +10,27 @@ body {
     background: #f5f6fa;
     color: #2c3e50;
     line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/* Overlay opcional anti-banding para suavizar gradientes em monitores VA/IPS */
+.anti-banding-overlay {
+    position: fixed;
+    pointer-events: none;
+    inset: 0;
+    z-index: 9999;
+    opacity: 0.04; /* sutil, quase imperceptível */
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><filter id="n" x="0" y="0"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" stitchTiles="stitch"/></filter><rect width="64" height="64" filter="url(%23n)" opacity="0.6"/></svg>');
+    mix-blend-mode: overlay;
+}
+
+/* Classe utilitária para aplicar smoothing extra em blocos específicos se necessário */
+.font-smooth {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: geometricPrecision;
 }
 
 /* App Container */

@@ -1862,7 +1862,10 @@ function atualizarRelatorioPorRota(porRotaData) {
         return;
     }
     
+    // Limpar antes de renderizar em lote
     tbody.innerHTML = '';
+    // Renderização em lote para reduzir reflows quando há muitas rotas
+    const fragment = document.createDocumentFragment();
     
     // Verificar se há dados para processar
     if (!porRotaData || Object.keys(porRotaData).length === 0) {
@@ -1888,7 +1891,7 @@ function atualizarRelatorioPorRota(porRotaData) {
         const maiorAtrasoChegada = stats.maior_atraso_chegada || 0;
         const pontualidadeChegada = Number(stats.pontualidade_chegada || 0).toFixed(1);
         
-        const row = tbody.insertRow();
+        const row = document.createElement('tr');
         row.innerHTML = `
             <td>
                 <span class="rota-badge">${nomeRota}</span>
@@ -1915,7 +1918,10 @@ function atualizarRelatorioPorRota(porRotaData) {
                 </div>
             </td>
         `;
+        fragment.appendChild(row);
     });
+    // Inserir todas as linhas de uma vez
+    tbody.appendChild(fragment);
     
 }
 
@@ -2241,14 +2247,14 @@ function criarGraficoAreaDatetime() {
             animations: {
                 enabled: true,
                 easing: 'easeinout',
-                speed: 1000,
+                speed: 600,
                 animateGradually: {
                     enabled: true,
-                    delay: 150
+                    delay: 80
                 },
                 dynamicAnimation: {
                     enabled: true,
-                    speed: 500
+                    speed: 300
                 }
             },
             zoom: {
@@ -2839,14 +2845,14 @@ function criarGraficoPizza() {
             animations: {
                 enabled: true,
                 easing: 'easeinout',
-                speed: 800,
+                speed: 500,
                 animateGradually: {
                     enabled: true,
-                    delay: 150
+                    delay: 80
                 },
                 dynamicAnimation: {
                     enabled: true,
-                    speed: 350
+                    speed: 220
                 }
             },
             dropShadow: {
@@ -3388,6 +3394,15 @@ async function atualizarGraficosAnalytics() {
     }
 }
 
+// Debounce para evitar múltiplas atualizações consecutivas pesadas
+let _updateChartsDebounce;
+function atualizarGraficosAnalyticsDebounced(delay = 200) {
+    if (_updateChartsDebounce) clearTimeout(_updateChartsDebounce);
+    _updateChartsDebounce = setTimeout(() => {
+        atualizarGraficosAnalytics();
+    }, delay);
+}
+
 function aplicarFiltrosAvancados(dados, turno, horario, rotaId) {
     let dadosFiltrados = [...dados];
 
@@ -3439,6 +3454,8 @@ function atualizarGraficoAreaDatetime(dados) {
 
     // Processar dados para o gráfico de área
     const dadosProcessados = processarDadosAreaDatetime(dados);
+    // Determinar tamanho total do dataset
+    const totalPontos = (dadosProcessados.programado?.length || 0) + (dadosProcessados.real?.length || 0);
     
     // Atualizar título baseado nos filtros selecionados
     const horarioSelecionado = document.getElementById('analytics-horario').value;
@@ -3477,9 +3494,19 @@ function atualizarGraficoAreaDatetime(dados) {
         nomeSerieReal = 'Horário Retorno/Destino';
     }
 
+    // Reduzir animações se muitos pontos
+    const animacoesPesadas = totalPontos > 400;
     candlestickChart.updateOptions({
         title: {
             text: titulo
+        },
+        chart: {
+            animations: {
+                enabled: !animacoesPesadas,
+                speed: animacoesPesadas ? 200 : 600,
+                animateGradually: { enabled: !animacoesPesadas },
+                dynamicAnimation: { enabled: !animacoesPesadas }
+            }
         }
     });
 
@@ -3597,11 +3624,22 @@ function atualizarGraficoPizza(dados) {
         ? `Distribuição de Rotas - ${turnoNome} (Sem atrasos registrados)`
         : `Distribuição de Atrasos por Rota - ${turnoNome}`;
 
+    // Reduzir animações quando há muitas fatias
+    const totalFatias = labels.length;
+    const animacoesPesadas = totalFatias > 20;
     pizzaChart.updateOptions({
         labels: labels,
         series: valoresParaGrafico,
         title: {
             text: tituloGrafico
+        },
+        chart: {
+            animations: {
+                enabled: !animacoesPesadas,
+                speed: animacoesPesadas ? 200 : 500,
+                animateGradually: { enabled: !animacoesPesadas },
+                dynamicAnimation: { enabled: !animacoesPesadas }
+            }
         }
     });
 
@@ -4040,10 +4078,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const dataInicio = document.getElementById('analytics-data-inicio');
     const dataFim = document.getElementById('analytics-data-fim');
     
-    if (rotaSelect) rotaSelect.addEventListener('change', atualizarGraficosAnalytics);
-    if (horarioSelect) horarioSelect.addEventListener('change', atualizarGraficosAnalytics);
-    if (dataInicio) dataInicio.addEventListener('change', atualizarGraficosAnalytics);
-    if (dataFim) dataFim.addEventListener('change', atualizarGraficosAnalytics);
+    if (rotaSelect) rotaSelect.addEventListener('change', () => atualizarGraficosAnalyticsDebounced());
+    if (horarioSelect) horarioSelect.addEventListener('change', () => atualizarGraficosAnalyticsDebounced());
+    if (dataInicio) dataInicio.addEventListener('change', () => atualizarGraficosAnalyticsDebounced(300));
+    if (dataFim) dataFim.addEventListener('change', () => atualizarGraficosAnalyticsDebounced(300));
 });
 
 // === TOOLTIP FUNCTIONS ===
