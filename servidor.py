@@ -14,13 +14,11 @@ from banco import (
     contar_usuarios,
     criar_usuario,
     carregar_rotas_config,
-    salvar_rotas_config,
     obter_rota_por_id,
     criar_rota,
     atualizar_rota,
     deletar_rota,
     carregar_percursos,
-    salvar_percursos,
     obter_percursos_filtrados,
     criar_percurso,
     obter_percurso_por_id,
@@ -367,12 +365,6 @@ def serve_js():
     from flask import send_from_directory
     return send_from_directory('utils', 'dashboard.js')
 
-@app.route('/script.js')
-def serve_old_js():
-    """Serve o arquivo JavaScript (compatibilidade)"""
-    from flask import send_from_directory
-    return send_from_directory('utils', 'dashboard.js')
-
 @app.route('/<filename>.html')
 def serve_html_files(filename):
     """Serve arquivos HTML da pasta utils"""
@@ -602,53 +594,6 @@ def deletar_percurso_api(percurso_id):
         return jsonify({'erro': str(e)}), 500
 
 # === RELATÓRIOS ===
-
-@app.route('/api/relatorio', methods=['GET'])
-def gerar_relatorio():
-    """Gera relatório integrado do sistema MaxTour"""
-    dados_percursos = carregar_percursos()
-    config_rotas = carregar_rotas_config()
-    
-    percursos = dados_percursos['percursos']
-    rotas_config = config_rotas['rotas']
-    
-    # Estatísticas de percursos/atrasos
-    total_percursos = len(percursos)
-    atrasos_saida = [p.get('atraso_saida', 0) for p in percursos if 'atraso_saida' in p]
-    atrasos_chegada = [p.get('atraso_chegada', 0) for p in percursos if 'atraso_chegada' in p]
-    
-    # Performance das rotas
-    rotas_performance = {}
-    for rota in rotas_config:
-        rota_id = rota['id']
-        percursos_rota = [p for p in percursos if p.get('rota_id') == rota_id]
-        
-        if percursos_rota:
-            atrasos_rota = [p.get('atraso_saida', 0) for p in percursos_rota if 'atraso_saida' in p]
-            atraso_medio = round(sum(atrasos_rota) / len(atrasos_rota), 2) if atrasos_rota else 0
-            pontuais = len([a for a in atrasos_rota if a <= 0])
-            
-            rotas_performance[rota['nome']] = {
-                'total_percursos': len(percursos_rota),
-                'atraso_medio': atraso_medio,
-                'percursos_pontuais': pontuais,
-                'percentual_pontualidade': round((pontuais / len(percursos_rota)) * 100, 1) if percursos_rota else 0
-            }
-    
-    relatorio = {
-        'resumo_operacional': {
-            'total_rotas_ativas': len([r for r in rotas_config if r.get('ativa', True)]),
-            'total_percursos_registrados': total_percursos,
-            'atraso_medio_geral': round(sum(atrasos_saida) / len(atrasos_saida), 2) if atrasos_saida else 0,
-            'maior_atraso_registrado': max(atrasos_saida) if atrasos_saida else 0,
-            'percursos_pontuais': len([a for a in atrasos_saida if a <= 0]),
-            'percentual_pontualidade_geral': round((len([a for a in atrasos_saida if a <= 0]) / len(atrasos_saida)) * 100, 1) if atrasos_saida else 0
-        },
-        'performance_por_rota': rotas_performance,
-        'data_geracao': datetime.now().isoformat()
-    }
-    
-    return jsonify(relatorio)
 
 @app.route('/api/relatorio/atrasos', methods=['GET'])
 def relatorio_atrasos():

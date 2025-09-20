@@ -4048,49 +4048,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // === TOOLTIP FUNCTIONS ===
 
-// Função de debug para verificar dados do gráfico pizza
-function debugGraficoPizza() {
-    
-    // Verificar filtros atuais
-    const turno = document.getElementById('analytics-turno')?.value;
-    const dataInicio = document.getElementById('analytics-data-inicio')?.value;
-    const dataFim = document.getElementById('analytics-data-fim')?.value;
-
-    
-    // Aplicar filtros e ver resultado
-    const dadosFiltrados = aplicarFiltrosPizza(jornadas, turno);
-    
-    // Agrupar por rota
-    const dadosPorRota = {};
-    dadosFiltrados.forEach(jornada => {
-        let rotaNome = jornada.nome_rota;
-        if (!rotaNome) {
-            const rotaEncontrada = rotas.find(r => r.id === jornada.rota_id);
-            rotaNome = rotaEncontrada ? rotaEncontrada.nome : jornada.rota_id;
-        }
-        
-        if (!dadosPorRota[rotaNome]) {
-            dadosPorRota[rotaNome] = { jornadas: 0, atrasos: 0 };
-        }
-        
-        dadosPorRota[rotaNome].jornadas++;
-        
-        // Calcular atrasos
-        let atrasoTotal = 0;
-        if (jornada.atraso_saida !== undefined && jornada.atraso_saida !== null) {
-            atrasoTotal += Math.max(0, jornada.atraso_saida);
-        }
-        if (jornada.atraso_chegada !== undefined && jornada.atraso_chegada !== null) {
-            atrasoTotal += Math.max(0, jornada.atraso_chegada);
-        }
-        
-        dadosPorRota[rotaNome].atrasos += atrasoTotal;
-    });
-    
-}
-
-// Adicionar debugGraficoPizza ao escopo global para teste
-window.debugGraficoPizza = debugGraficoPizza;
+// (removido) debugGraficoPizza: função de debug não utilizada
 
 function mostrarTooltip(e, htmlContent) {
     // 1. Criar tooltip global se não existir
@@ -4818,34 +4776,7 @@ function atualizarMiniGraficoReal(turnoCard, historico, turnoKey) {
 }
 
 // Função para atualizar mini-gráfico
-function atualizarMiniGrafico(turnoCard, historico) {
-    const miniChart = turnoCard.querySelector('.mini-chart');
-    if (!miniChart || !historico.length) return;
-
-    miniChart.innerHTML = '';
-    
-    const maxValue = Math.max(...historico.map(h => h.pontualidade || 0));
-    
-    historico.forEach(dia => {
-        const bar = document.createElement('div');
-        bar.className = 'chart-bar';
-        const height = maxValue > 0 ? (dia.pontualidade / maxValue) * 100 : 10;
-        bar.style.height = `${height}%`;
-        
-        // Tooltip
-        bar.title = `${dia.data}: ${dia.pontualidade.toFixed(1)}% pontualidade`;
-        
-        miniChart.appendChild(bar);
-    });
-
-    // Atualizar valor do gráfico
-    const chartValue = turnoCard.querySelector('.chart-value');
-    if (chartValue && historico.length >= 2) {
-        const ultimaDiff = historico[historico.length - 1].pontualidade - historico[historico.length - 2].pontualidade;
-        chartValue.textContent = ultimaDiff >= 0 ? `+${ultimaDiff.toFixed(1)}%` : `${ultimaDiff.toFixed(1)}%`;
-        chartValue.className = `chart-value ${ultimaDiff >= 0 ? 'positive' : 'negative'}`;
-    }
-}
+// (removido) atualizarMiniGrafico: função antiga não utilizada; substituída por atualizarMiniGraficoReal
 
 // Função para atualizar comparação entre turnos com dados reais
 function atualizarComparacaoTurnosReal(dadosTurnos) {
@@ -5046,92 +4977,6 @@ function atualizarInsightsReais(dadosTurnos) {
         `;
         insightsContainer.appendChild(insightDiv);
     });
-}
-
-// Função para atualizar insights
-function atualizarInsights(dadosTurnos) {
-    const insightsContainer = document.querySelector('.comparison-insights');
-    if (!insightsContainer) return;
-
-    const insights = [];
-    
-    const matutino = dadosTurnos.matutino;
-    const noturno = dadosTurnos.noturno;
-
-    // Insight de pontualidade
-    if (parseFloat(matutino.pontualidade) > parseFloat(noturno.pontualidade)) {
-        insights.push({
-            type: 'positive',
-            icon: 'fas fa-thumbs-up',
-            text: `Turno Matutino está ${(parseFloat(matutino.pontualidade) - parseFloat(noturno.pontualidade)).toFixed(1)}% mais pontual`
-        });
-    } else if (parseFloat(noturno.pontualidade) > parseFloat(matutino.pontualidade)) {
-        insights.push({
-            type: 'info',
-            icon: 'fas fa-moon',
-            text: `Turno Noturno superou o Matutino em ${(parseFloat(noturno.pontualidade) - parseFloat(matutino.pontualidade)).toFixed(1)}% na pontualidade`
-        });
-    }
-
-    // Insight de volume
-    if (matutino.jornadas > noturno.jornadas) {
-        insights.push({
-            type: 'info',
-            icon: 'fas fa-chart-bar',
-            text: `Matutino processa ${matutino.jornadas - noturno.jornadas} jornadas a mais que o Noturno`
-        });
-    }
-
-    // Insight de atraso
-    if (parseFloat(matutino.atrasoMedio) < parseFloat(noturno.atrasoMedio) && matutino.atrasoMedio > 0) {
-        insights.push({
-            type: 'warning',
-            icon: 'fas fa-clock',
-            text: `Noturno tem atrasos ${(parseFloat(noturno.atrasoMedio) - parseFloat(matutino.atrasoMedio)).toFixed(1)}min maiores em média`
-        });
-    }
-
-    insightsContainer.innerHTML = '';
-    insights.forEach(insight => {
-        const insightDiv = document.createElement('div');
-        insightDiv.className = `insight-item ${insight.type}`;
-        insightDiv.innerHTML = `
-            <i class="${insight.icon}"></i>
-            <span>${insight.text}</span>
-        `;
-        insightsContainer.appendChild(insightDiv);
-    });
-}
-
-// Função para atualizar manualmente os dados (pode ser chamada por botões)
-function atualizarDadosPerformance() {
-    carregarPerformanceTurnosEnhanced();
-}
-
-// Configurar atualização periódica dos dados de performance
-setInterval(() => {
-    carregarPerformanceTurnosEnhanced();
-}, 5 * 60 * 1000); // A cada 5 minutos
-
-// ===================================
-// FUNÇÕES PREMIUM PARA RELATÓRIOS
-// ===================================
-
-// Toggle para métricas secundárias
-function toggleMetricasSecundarias() {
-    const button = document.querySelector('.resumo-expand-btn');
-    const metrics = document.getElementById('metricas-secundarias');
-    const icon = button.querySelector('i');
-    
-    if (metrics.style.display === 'none' || !metrics.style.display) {
-        metrics.style.display = 'block';
-        button.classList.add('active');
-        icon.style.transform = 'rotate(180deg)';
-    } else {
-        metrics.style.display = 'none';
-        button.classList.remove('active');
-        icon.style.transform = 'rotate(0deg)';
-    }
 }
 
 // Sistema de ordenação para tabelas premium
@@ -5854,6 +5699,33 @@ document.addEventListener('fullscreenchange', function() {
 // === FUNÇÕES DE TESTE (DESENVOLVIMENTO) ===
 // Para testes de desenvolvimento, descomente as funções conforme necessário
 
+// Controle de métricas secundárias (expand/colapse)
+function toggleMetricasSecundarias() {
+    try {
+        const container = document.getElementById('metricas-secundarias');
+        const btn = document.querySelector('.resumo-expand-btn');
+        if (!container || !btn) return;
+
+        const icon = btn.querySelector('i');
+        const isHidden = container.style.display === 'none' || container.style.display === '';
+
+        if (isHidden) {
+            container.style.display = 'block';
+            btn.classList.add('active');
+            if (icon) icon.style.transform = 'rotate(180deg)';
+        } else {
+            container.style.display = 'none';
+            btn.classList.remove('active');
+            if (icon) icon.style.transform = 'rotate(0deg)';
+        }
+    } catch (e) {
+        console.error('Erro ao alternar métricas secundárias:', e);
+    }
+}
+
+// Expor no escopo global para o onclick do HTML
+window.toggleMetricasSecundarias = toggleMetricasSecundarias;
+
 /**
  * Detecta o tipo de movimento baseado nos campos disponíveis
  * @param {Object} item - Item de dados
@@ -6088,67 +5960,13 @@ function updateFloatingHeaderTime() {
 }
 
 // Função para sincronizar estado dos botões de refresh
-function syncRefreshButtonState(isRefreshing) {
-    const mainRefreshBtn = document.getElementById('btn-refresh-all');
-    const floatingRefreshBtn = document.getElementById('floating-btn-refresh');
-    
-    if (mainRefreshBtn && floatingRefreshBtn) {
-        if (isRefreshing) {
-            mainRefreshBtn.disabled = true;
-            floatingRefreshBtn.disabled = true;
-            
-            const mainIcon = mainRefreshBtn.querySelector('i');
-            const floatingIcon = floatingRefreshBtn.querySelector('i');
-            
-            if (mainIcon) mainIcon.classList.add('fa-spin');
-            if (floatingIcon) floatingIcon.classList.add('fa-spin');
-        } else {
-            mainRefreshBtn.disabled = false;
-            floatingRefreshBtn.disabled = false;
-            
-            const mainIcon = mainRefreshBtn.querySelector('i');
-            const floatingIcon = floatingRefreshBtn.querySelector('i');
-            
-            if (mainIcon) mainIcon.classList.remove('fa-spin');
-            if (floatingIcon) floatingIcon.classList.remove('fa-spin');
-        }
-    }
-}
+// (removido) syncRefreshButtonState: não utilizada; controle de loading já feito em atualizarTodosOsDados
 
 // Função para atualizar contagem de notificações em ambos os headers
-function updateNotificationCount(count) {
-    const mainCount = document.querySelector('.main-header .notification-count');
-    const floatingCount = document.querySelector('.floating-header .notification-count');
-    
-    [mainCount, floatingCount].forEach(element => {
-        if (element) {
-            element.textContent = count;
-            if (count > 0) {
-                element.style.display = 'flex';
-            } else {
-                element.style.display = 'none';
-            }
-        }
-    });
-}
+// (removido) updateNotificationCount: não utilizada
 
 // Função para alterar título em ambos os headers
-function updatePageTitle(newTitle) {
-    const mainTitle = document.getElementById('page-title');
-    const floatingTitle = document.getElementById('floating-title-text');
-    
-    if (mainTitle) {
-        // Manter apenas o texto, preservando os ícones
-        const titleTextNode = mainTitle.childNodes[mainTitle.childNodes.length - 1];
-        if (titleTextNode && titleTextNode.nodeType === Node.TEXT_NODE) {
-            titleTextNode.textContent = newTitle;
-        }
-    }
-    
-    if (floatingTitle) {
-        floatingTitle.textContent = newTitle;
-    }
-}
+// (removido) updatePageTitle: não utilizada
 
 // Inicializar quando o DOM estiver pronto
 document.addEventListener('DOMContentLoaded', function() {

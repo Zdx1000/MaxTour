@@ -5,8 +5,6 @@ from datetime import datetime
 from contextlib import contextmanager
 import secrets
 import hashlib
-import uuid
-import sqlite3
 
 # Nome do arquivo de banco de dados
 DATABASE_FILE = 'dados.db'
@@ -652,22 +650,6 @@ def carregar_rotas_config():
         
         return {'rotas': rotas}
 
-def salvar_rotas_config(config):
-    """Salva a configuração das rotas no banco de dados"""
-    with obter_conexao() as conn:
-        cursor = conn.cursor()
-        
-        # Limpa todas as rotas existentes
-        cursor.execute('DELETE FROM rotas')
-        
-        # Insere as novas rotas
-        for rota in config['rotas']:
-            cursor.execute('''
-                INSERT INTO rotas (id, nome, ativa, horarios) 
-                VALUES (?, ?, ?, ?)
-            ''', (rota['id'], rota['nome'], 1 if rota['ativa'] else 0, json.dumps(rota['horarios'])))
-        
-        conn.commit()
 
 def obter_rota_por_id(rota_id):
     """Obtém uma rota específica por ID"""
@@ -784,11 +766,6 @@ def carregar_percursos():
         
         return {'percursos': percursos}
 
-def salvar_percursos(dados):
-    """Salva os dados de percursos no banco de dados (compatibilidade)"""
-    # Esta função é mantida para compatibilidade, mas não é mais necessária
-    # pois os percursos são salvos individualmente
-    pass
 
 def obter_percursos_filtrados(rota_id=None, data_inicio=None, data_fim=None, turno=None):
     """Obtém percursos com filtros aplicados"""
